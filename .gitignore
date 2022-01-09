@@ -1,0 +1,6 @@
+*.ini
+*.exe
+build
+__pycache__
+dist
+*.spec
