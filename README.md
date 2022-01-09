@@ -14,33 +14,46 @@
 
 # 사용 방법
 ## 필수 설치 
-1) python 3.9.x ,pyqt5 , requests, selenium
+1) python 3.9.x ,pyqt5 , requests
 
 ## 설치 방법
 - python 생략 ( 개발환경에 맞게 설치 )
 - pip install pyqt5
-- pip install selenium
 - pip install requests
 
-## 사용환경 구성하기
-- 해당 매크로에서 사용하는 크롬 드라이버는 95.0.4638.69(공식 빌드)(64비트) 버전을 기준으로 사용하고 있음
-- 하여 사용하려는 장비의 크롬 버전이 맞지 않다면 드라이버를 별도 다운받아야 함.
-( 드라이버 다운 링크 : https://chromedriver.chromium.org/downloads )
+# INI 파일 만들기
+- 실행하기 위해서는 ini 파일이 필요함.
+- main.py 와 같은 디렉토리에 auto.ini 파일 생성
+- 아래와 같이 파일 작성
+( ID 는 여러개 설정으로 등록해서 사용 가능, AUTH, SESS 가져오는 방법은 값은 글 하단부분 참고 )
 
-## 디버그로 사용할 크롬을 기본 크롬으로 셋팅 하기
-** 이는 소스상 " options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")  " 해당 부분 때문에 설정하는 것으로 
-   해당 방법을 사용하지 않고 디버그 크롬을 사용해도 된다.
-1. 사용하고 있는 크롬 브라우저의 바로가기 새로 만들기
-2. 바로가기 우클릭-> 속성에서 "대상(T)" 부분을 아래와 같이 추가 해준다.
-** 주의 : 하기 임시 크롬의 파일들 경로는 별도 생성해주는것이 좋음 ( 크롬 실행시 이력이나 기타 파일들이 많이생성됨.. )
 
-"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --remote-debugging-port=9222 --user-data-dir="D:\ChormeTemp"
+```
 
-1) C:\Program Files (x86)\Google\Chrome\Application\chrome.exe : 기본 크롬 실행파일 위치
-2) --remote-debugging-port=9222 : 임시 리모트 포트 설정
-3) --user-data-dir="D:\ChormeTemp" : 임시 크롬의 파일 생성 
+[COMMON]
 
-## 네이버 세션 키 등록 하기 ( 추후 자동화 예정 )
+ACCOUNT_CNT = 1
+
+AUTH_0 = OueJc2e24WcGxZRgNFyX...
+SESS_0 = AAABqMf6G8ePcPIH4UJ4WuLwDOuCSJLf...
+
+[COMMENTER] 
+
+## Kann 
+CAFFEID = 29118241
+
+## Kann
+CHECKER_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberNetworkArticleList?search.cafeId=29118241&search.memberKey=uclL7CZV-8neohJyN6dIAw&search.perPage=40&search.page=1&requestFrom=B
+
+COMMENT_TEXT = a
+
+[CHECKER]
+
+API_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberLevelInfo?cafeId=29118241
+
+```
+
+# 네이버 세션 키 등록 하기 
 해당 프로그램을 사용하기 위해선 로그인 정보가 필요함. ( 'n_aut', 'n_ses' 키 부분임 )
 확인 방법은
 1) 네이버에 로그인 후 "F12 개발자 모드" 로 network 부분 클릭
@@ -55,7 +68,7 @@ cookie: NNB=4RDPYNED2VSGC; NM_THEME_EDIT=; ASID=dd95af010000017c722aeecb00000059
 NID_AUT = 89U1PNkPF/CUF4+yrG1tWNMqXI0BZ01cuV8G3lDH+qxPva+...;
 NID_SES = AAABrai6wGVKCOTNgbwnwBqqUeqssXctRUujAVJhl...
 
-## 실행하기
+# 실행하기
 1) 위에서 설정한 바로가기 버튼으로 리모트 디버그 크롬 실행.
 2) python main.py  실행 후 UI 에서 원하는 기능 버튼 클릭.
 
