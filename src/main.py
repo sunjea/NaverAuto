@@ -16,22 +16,28 @@ config.read('./auto.ini')
 
 account_cnt = config['COMMON']['ACCOUNT_CNT']
 
-n_aut = []
-n_sess = []
+n_loginid = []
+n_passwd = []
 commentText = []
+sess = []
 
 for conf in range(0, int(account_cnt)) :
-    a_str = 'AUTH_' + str(conf)
-    s_str = 'SESS_' + str(conf)
+    a_str = 'ID_' + str(conf)
+    s_str = 'PASSSWD_' + str(conf)
     c_str = 'COMMENT_TEXT_' + str(conf)
-  
+    
     try :
-        n_aut.append(config['COMMON'][a_str])
-        n_sess.append(config['COMMON'][s_str])
+        ## 각 계정별 설정 
+        n_loginid.append(config['COMMON'][a_str])
+        n_passwd.append(config['COMMON'][s_str])
         commentText.append(config['COMMENTER'][c_str])
+        ## 로그인 세션 set..
+        sess.append(naver_session(n_loginid[conf], n_passwd[conf]))
+        # print(sess[conf])
     except :
         pass
 
+## 공통 설정
 url_api = config['CHECKER']['API_URI']
 caffeId = config['COMMENTER']['CAFFEID']
 apiReqUrI = config['COMMENTER']['CHECKER_URI']
@@ -44,11 +50,8 @@ class CommentThread(QThread):
     def run(self): 
         loop = True
         find = True
-
-        user_agent = 'Mozilla/5.0 1.2.1'
-        header = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[0]+' NID_SES='+n_sess[0] } 
-        req = requests.get(apiReqUrI, headers = header).json() 
-        
+ 
+        req = sess[0].get(apiReqUrI).json()
         result = req['message']['status']                       # 결과
         totalCnt = req['message']['result']['totalCount']       # 전체 Count
         oldtotalCnt = totalCnt   
@@ -61,16 +64,12 @@ class CommentThread(QThread):
             nowtime = time.strftime('%Y-%m-%d %I:%M:%S %p', tm)
             self.parent.txtLog.append(nowtime + ' ID 찾는중 ..')
             while find :
-                
-                header = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[0]+' NID_SES='+n_sess[0] } 
-                req = requests.get(apiReqUrI, headers = header).json() 
-                # req = requests.get(apiReqUrI).json()
+                req = sess[0].get(apiReqUrI).json()
                 result = req['message']['status']                       # 결과
                 totalCnt = req['message']['result']['totalCount']       # 전체 Count 
                 
                 if totalCnt !=  oldtotalCnt :
                     articleid = req['message']['result']['articleList'][0]['articleid']
-                    # oldtotalCnt = totalCnt
                     find = False
                     break
                
@@ -85,10 +84,9 @@ class CommentThread(QThread):
             
             for conf in range(0, int(account_cnt)) :    
                 jsondata = {'cafeId':caffeId, 'articleId': articleid, 'content':commentText[conf], 'requestFrom' : 'B'}
-                user_agent = 'Mozilla/5.0 1.2.' + str(conf)
-                headers = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[conf]+' NID_SES='+n_sess[conf] } 
-                rsp = requests.post('https://apis.naver.com/cafe-web/cafe-mobile/CommentPost.json', data=jsondata, headers=headers, timeout=timeout)
- 
+
+                # 각 세션으로 Post 전달
+                rsp = sess[conf].post('https://apis.naver.com/cafe-web/cafe-mobile/CommentPost.json', data=jsondata, timeout=timeout)
                 if rsp.status_code == 200 :
                     self.parent.txtLog.append(nowtime + ' 댓글 작성완료')
                     loop = False
@@ -116,9 +114,7 @@ class CheckThread(QThread):
                 self.parent.txtLog.append("체크 시간 : " + string )
                 timeout = 5
                 for conf in range(0, int(account_cnt)) :
-                    user_agent = 'Mozilla/5.0 1.2.' + str(conf)
-                    header = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[conf]+' NID_SES='+n_sess[conf] } 
-                    req = requests.get(url_api, headers = header).json() 
+                    req = sess[conf].get(url_api).json()
                     self.parent.txtLog.append("카페 멤버 상태 : {0} ".format(req['message']['result']['isCafeMember'] == True and "맴버" or "비회원"))
 
                     if req['message']['result']['isCafeMember'] == True :
