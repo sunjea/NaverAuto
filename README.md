@@ -29,46 +29,35 @@
 
 
 ```
-
 [COMMON]
 
 ACCOUNT_CNT = 1
 
-AUTH_0 = OueJc2e24WcGxZRgNFyX...
-SESS_0 = AAABqMf6G8ePcPIH4UJ4WuLwDOuCSJLf...
+ID_0 = 
+PASSSWD_0 = 
 
-[COMMENTER] 
-
+[COMMENTER]
+## test
+CAFFEID = 11887565 
 ## Kann 
-CAFFEID = 29118241
+#CAFFEID = 29118241
 
-## Kann
-CHECKER_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberNetworkArticleList?search.cafeId=29118241&search.memberKey=uclL7CZV-8neohJyN6dIAw&search.perPage=40&search.page=1&requestFrom=B
+## test
+CHECKER_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberNetworkArticleList?search.cafeId=11887565&search.memberKey=xHvQQfnay_QW_GQTv9Ziow&search.perPage=40&search.page=1&requestFrom=B
 
-COMMENT_TEXT = a
+## Kann KapUchiNo -- THIS USE
+#CHECKER_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberNetworkArticleList?search.cafeId=29118241&search.memberKey=uclL7CZV-8neohJyN6dIAw&search.perPage=40&search.page=1&requestFrom=B
+
+## Kann_manager
+# CHECKER_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberNetworkArticleList?search.cafeId=29118241&search.memberKey=AeTNY4uU7_53EX6k23ujeA&search.perPage=40&search.page=1&requestFrom=B
+## Kann_kaki
+# CHECKER_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberNetworkArticleList?search.cafeId=29118241&search.memberKey=AkE9kKRptSgOX7_OkHAC6Q&search.perPage=40&search.page=1&requestFrom=B
+
+COMMENT_TEXT_0 = a
 
 [CHECKER]
 
 API_URI = https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberLevelInfo?cafeId=29118241
-
 ```
 
-# 네이버 세션 키 등록 하기 
-해당 프로그램을 사용하기 위해선 로그인 정보가 필요함. ( 'n_aut', 'n_ses' 키 부분임 )
-확인 방법은
-1) 네이버에 로그인 후 "F12 개발자 모드" 로 network 부분 클릭
-2) 네이버 페이지 새로 고침
-3) www.naver.com 요청 부분 찾기
-4) Request 부분에 cookie 값 확인 
-예)
-cookie: NNB=4RDPYNED2VSGC; NM_THEME_EDIT=; ASID=dd95af010000017c722aeecb00000059; PM_MY_NOTICE_TOOLTIP=Y; NID_AUT=89U1PNkPF/CUF4+yrG1tWNMqXI0BZ01cuV8G3lDH+qxPva+GQAeZYSPdTLNVmRXo; NID_JKL=NWdfmrfIoC8d0s9Y2mX0cfwZb4b3V0lwiqzgMdzJd3Y=; NV_WETR_LAST_ACCESS_RGN_M="MDk1OTAxMDc="; NV_WETR_LOCATION_RGN_M="MDk1OTAxMDc="; nx_ssl=2; NM_THEME_LAST_FIXED=CARGAME; NDARK=N; page_uid=hieQksprvTossP5VaEZssssst70-218397; _naver_usersession_=H2HgQ53jgx48FmHFos52qA==; PM_CK_loc=dbb76f46a236a564f445f25761a317ebe251f1cd5c9026abb61a0f126b922b70; NID_SES=AAABrai6wGVKCOTNgbwnwBqqUeqssXctRUujAVJhl...
-
-5) 위처럼 나온 쿠기에서 NID_AUT 값 , NID_SES 값 만 복사 해서 넣기.
-예)
-NID_AUT = 89U1PNkPF/CUF4+yrG1tWNMqXI0BZ01cuV8G3lDH+qxPva+...;
-NID_SES = AAABrai6wGVKCOTNgbwnwBqqUeqssXctRUujAVJhl...
-
-# 실행하기
-1) 위에서 설정한 바로가기 버튼으로 리모트 디버그 크롬 실행.
-2) python main.py  실행 후 UI 에서 원하는 기능 버튼 클릭.
 
