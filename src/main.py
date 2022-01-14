@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtWidgets import * 
 from PyQt5 import uic 
 from PyQt5.QtCore import *
+from login import naver_session
 
 import configparser
 import requests 
@@ -17,21 +18,23 @@ account_cnt = config['COMMON']['ACCOUNT_CNT']
 
 n_aut = []
 n_sess = []
+commentText = []
 
 for conf in range(0, int(account_cnt)) :
     a_str = 'AUTH_' + str(conf)
     s_str = 'SESS_' + str(conf)
+    c_str = 'COMMENT_TEXT_' + str(conf)
   
     try :
         n_aut.append(config['COMMON'][a_str])
         n_sess.append(config['COMMON'][s_str])
+        commentText.append(config['COMMENTER'][c_str])
     except :
         pass
 
 url_api = config['CHECKER']['API_URI']
 caffeId = config['COMMENTER']['CAFFEID']
 apiReqUrI = config['COMMENTER']['CHECKER_URI']
-commentText = config['COMMENTER']['COMMENT_TEXT']
 
 class CommentThread(QThread): 
     def __init__(self, parent): 
@@ -41,8 +44,11 @@ class CommentThread(QThread):
     def run(self): 
         loop = True
         find = True
-        req = requests.get(apiReqUrI).json()
 
+        user_agent = 'Mozilla/5.0 1.2.1'
+        header = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[0]+' NID_SES='+n_sess[0] } 
+        req = requests.get(apiReqUrI, headers = header).json() 
+        
         result = req['message']['status']                       # 결과
         totalCnt = req['message']['result']['totalCount']       # 전체 Count
         oldtotalCnt = totalCnt   
@@ -55,8 +61,10 @@ class CommentThread(QThread):
             nowtime = time.strftime('%Y-%m-%d %I:%M:%S %p', tm)
             self.parent.txtLog.append(nowtime + ' ID 찾는중 ..')
             while find :
-    
-                req = requests.get(apiReqUrI).json()
+                
+                header = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[0]+' NID_SES='+n_sess[0] } 
+                req = requests.get(apiReqUrI, headers = header).json() 
+                # req = requests.get(apiReqUrI).json()
                 result = req['message']['status']                       # 결과
                 totalCnt = req['message']['result']['totalCount']       # 전체 Count 
                 
@@ -73,11 +81,10 @@ class CommentThread(QThread):
             url += str(articleid)
             url += '/comments?search.clubid='+caffeId+'&search.articleid='
             url += str(articleid)
-            
-            jsondata = {'cafeId':caffeId, 'articleId': articleid, 'content':commentText, 'requestFrom' : 'B'}
             timeout = 5
             
-            for conf in range(0, int(account_cnt)) :
+            for conf in range(0, int(account_cnt)) :    
+                jsondata = {'cafeId':caffeId, 'articleId': articleid, 'content':commentText[conf], 'requestFrom' : 'B'}
                 user_agent = 'Mozilla/5.0 1.2.' + str(conf)
                 headers = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[conf]+' NID_SES='+n_sess[conf] } 
                 rsp = requests.post('https://apis.naver.com/cafe-web/cafe-mobile/CommentPost.json', data=jsondata, headers=headers, timeout=timeout)
@@ -112,7 +119,7 @@ class CheckThread(QThread):
                     user_agent = 'Mozilla/5.0 1.2.' + str(conf)
                     header = {'User-Agent': user_agent, 'cookie' : 'NID_AUT='+n_aut[conf]+' NID_SES='+n_sess[conf] } 
                     req = requests.get(url_api, headers = header).json() 
-                    # self.parent.txtLog.append("카페 멤버 상태 : {0} ".format(req['message']['result']['isCafeMember'] == True and "맴버" or "비회원"))
+                    self.parent.txtLog.append("카페 멤버 상태 : {0} ".format(req['message']['result']['isCafeMember'] == True and "맴버" or "비회원"))
 
                     if req['message']['result']['isCafeMember'] == True :
                         self.parent.txtLog.append('닉네임 : ' + req['message']['result']['clubMember']['nickname'] + '  출석 횟수 : ' + str(req['message']['result']['clubMember']['cafeMemberActivity']['cafeVisit'] ) )
