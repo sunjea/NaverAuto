@@ -61,7 +61,7 @@ def naver_session(nid, npw):
 
 
 # if __name__ == "__main__":
-#     s = naver_session('jjinbbang0303','dntjs0413!@')
+#     s = naver_session('','')
 #     pp = s.get('https://apis.naver.com/cafe-web/cafe-mobile/CafeMemberNetworkArticleList?search.cafeId=11887565&search.memberKey=xHvQQfnay_QW_GQTv9Ziow&search.perPage=40&search.page=1&requestFrom=B')
     
 #     print(pp.json())
