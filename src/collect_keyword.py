@@ -43,8 +43,13 @@ def clean_html(raw_html) :
     return cleantext
 
 def send_slackmessage_keyword(msg) :
+    
+    config = configparser.ConfigParser()
+    config.read('./auto.ini')
+    slackUrI = config['SLACK']['SLACK_URI_KEYWORD'] 
+
     payload = { 'text' : msg }
-    rsp = requests.post('https://hooks.slack.com/services/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', json=payload )
+    rsp = requests.post(slackUrI, json=payload )
 
 
 def get_querydata() :
