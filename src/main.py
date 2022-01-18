@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic 
 from PyQt5.QtCore import *
 from login import naver_session
+from collect_keyword import *
 
 import configparser
 import requests 
@@ -15,6 +16,11 @@ config = configparser.ConfigParser()
 config.read('./auto.ini')
 
 account_cnt = config['COMMON']['ACCOUNT_CNT']
+## 공통 설정
+url_api = config['CHECKER']['API_URI']
+caffeId = config['COMMENTER']['CAFFEID']
+apiReqUrI = config['COMMENTER']['CHECKER_URI']
+slackUrI = config['SLACK']['SLACK_URI'] 
 
 n_loginid = []
 n_passwd = []
@@ -37,10 +43,15 @@ for conf in range(0, int(account_cnt)) :
     except :
         pass
 
-## 공통 설정
-url_api = config['CHECKER']['API_URI']
-caffeId = config['COMMENTER']['CAFFEID']
-apiReqUrI = config['COMMENTER']['CHECKER_URI']
+# DB 추가
+create_table()
+
+def send_slack_message(msg) :
+    # headers = { 'Content-type' : 'application/json' }
+    payload = { 'text' : msg }
+    # print(msg)  
+    rsp = requests.post(slackUrI, json=payload )
+    # print(rsp)
 
 class CommentThread(QThread): 
     def __init__(self, parent): 
@@ -113,12 +124,15 @@ class CheckThread(QThread):
             if sec == 0 or sec == 1800 :
                 self.parent.txtLog.append("체크 시간 : " + string )
                 timeout = 5
+                get_querydata()
                 for conf in range(0, int(account_cnt)) :
                     req = sess[conf].get(url_api).json()
                     self.parent.txtLog.append("카페 멤버 상태 : {0} ".format(req['message']['result']['isCafeMember'] == True and "맴버" or "비회원"))
 
                     if req['message']['result']['isCafeMember'] == True :
-                        self.parent.txtLog.append('닉네임 : ' + req['message']['result']['clubMember']['nickname'] + '  출석 횟수 : ' + str(req['message']['result']['clubMember']['cafeMemberActivity']['cafeVisit'] ) )
+                        msg = '닉네임 : ' + req['message']['result']['clubMember']['nickname'] + '  출석 횟수 : ' + str(req['message']['result']['clubMember']['cafeMemberActivity']['cafeVisit'] )
+                        self.parent.txtLog.append(msg )
+                        send_slack_message(msg)
                     time.sleep(1)
                     sec = 1800 - int(account_cnt)
             
