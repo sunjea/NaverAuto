@@ -2,6 +2,7 @@ import requests
 import json
 import re
 import sqlite3
+import configparser
 
 def create_table() :
     conn = sqlite3.connect('./keydata.db')
@@ -31,7 +32,7 @@ def db_set_articleid(article_id):
     if rows != None :
         cursor.execute('DELETE FROM ArticleInfo;')
         
-    # print('db_set_articleid : {0}'.format(article_id))
+    print('db_set_articleid : {0}'.format(article_id))
     cursor.execute('INSERT INTO ArticleInfo VALUES(:Article_Id);', {"Article_Id":article_id})
     
     conn.commit()
@@ -47,7 +48,7 @@ def send_slackmessage_keyword(msg) :
     config = configparser.ConfigParser()
     config.read('./auto.ini')
     slackUrI = config['SLACK']['SLACK_URI_KEYWORD'] 
-
+    print("slackUrI : {0} ".format(slackUrI))
     payload = { 'text' : msg }
     rsp = requests.post(slackUrI, json=payload )
 
@@ -70,7 +71,7 @@ def get_querydata() :
                     if '구' not in clean_html(rsp['message']['result']['articleList'][j]['item']['subject'])  :
                         if '카푸' in clean_html(rsp['message']['result']['articleList'][j]['item']['subject'])  :
                             if article_id  < rsp['message']['result']['articleList'][j]['item']['articleId'] :
-                                # print('제목 :{0}, ID : {1} , cost : {2} '.format(clean_html(rsp['message']['result']['articleList'][j]['item']['subject']), rsp['message']['result']['articleList'][j]['item']['articleId'],  rsp['message']['result']['articleList'][j]['item']['productSale']['cost'] ))
+                                print('제목 :{0}, ID : {1} , cost : {2} '.format(clean_html(rsp['message']['result']['articleList'][j]['item']['subject']), rsp['message']['result']['articleList'][j]['item']['articleId'],  rsp['message']['result']['articleList'][j]['item']['productSale']['cost'] ))
                             
                                 article_id = rsp['message']['result']['articleList'][j]['item']['articleId']
                                 db_set_articleid(article_id)

@@ -47,11 +47,8 @@ for conf in range(0, int(account_cnt)) :
 create_table()
 
 def send_slack_message(msg) :
-    # headers = { 'Content-type' : 'application/json' }
     payload = { 'text' : msg }
-    # print(msg)  
     rsp = requests.post(slackUrI, json=payload )
-    # print(rsp)
 
 class CommentThread(QThread): 
     def __init__(self, parent): 
